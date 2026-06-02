@@ -10,9 +10,10 @@ import { toast } from 'react-hot-toast';
 
 const getPhotoUrl = (path) => {
   if (!path) return null;
+  // Cloudinary or any absolute URL - use directly
   if (path.startsWith('http://') || path.startsWith('https://')) return path;
-  const baseUrl = import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL.replace('/api', '') : 'http://localhost:5000';
-  return `${baseUrl}${path}`;
+  // Relative path - works on same-origin (Render) and localhost dev
+  return path;
 };
 
 const StatCard = ({ title, value, icon: Icon, colorClass, gradient, onClick, locked }) => (
