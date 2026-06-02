@@ -1,0 +1,9 @@
+{
+  "libraryName": "Prakash Library",
+  "adminEmail": "admin@gmail.com",
+  "defaultSubscription": 600,
+  "lateFeePerDay": 10,
+  "revenuePin": "9999",
+  "emailNotificationsEnabled": false,
+  "whatsappNotificationsEnabled": false
+}

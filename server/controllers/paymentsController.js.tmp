@@ -1,0 +1,35 @@
+export const getMonthlyReport = async (req, res) => {
+  try {
+    const { month, year } = req.query; // e.g. month=5, year=2026
+
+    if (!month || !year) {
+      return res.status(400).json({ message: 'Month and year are required' });
+    }
+
+    // Convert month (1-indexed from frontend) to Date boundaries
+    const targetMonth = parseInt(month, 10);
+    const targetYear = parseInt(year, 10);
+
+    const startDate = new Date(targetYear, targetMonth - 1, 1);
+    const endDate = new Date(targetYear, targetMonth, 1); // First day of next month
+
+    const payments = await prisma.payment.findMany({
+      where: {
+        paymentDate: {
+          gte: startDate,
+          lt: endDate,
+        },
+      },
+      include: {
+        student: {
+          select: { fullName: true, studentId: true, phone: true }
+        }
+      },
+      orderBy: { paymentDate: 'desc' },
+    });
+
+    res.json(payments);
+  } catch (error) {
+    res.status(500).json({ message: 'Server Error', error: error.message });
+  }
+};

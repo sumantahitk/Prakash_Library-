@@ -1,0 +1,117 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      Role     @default(STUDENT)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  student   Student?
+}
+
+enum Role {
+  ADMIN
+  STUDENT
+}
+
+model Student {
+  id                  String         @id @default(uuid())
+  studentId           String         @unique
+  fullName            String
+  phone               String
+  address             String?
+  aadhaarNo           String?
+  seatNo              String?
+  slot                String?
+  admissionDate       DateTime       @default(now())
+  monthlySubscription Float          @default(0.0)
+  feeStatus           FeeStatus      @default(PENDING)
+  nextDueDate         DateTime?
+  remainingBalance    Float          @default(0.0)   // tracks partial payment balance
+  profilePhoto        String?
+  userId              String         @unique
+  user                User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  payments            Payment[]
+  notifications       Notification[]
+  isActive            Boolean        @default(true)
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
+}
+
+enum FeeStatus {
+  PAID
+  PENDING
+  DUE
+}
+
+model Payment {
+  id               String        @id @default(uuid())
+  studentId        String
+  student          Student       @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  studentName      String?       // Denormalized for easier DB viewing
+  libraryStudentId String?       // Denormalized for easier DB viewing
+  totalDue         Float                            // full subscription amount due this cycle
+  paidAmount       Float                            // amount paid in THIS transaction
+  remainingBalance Float         @default(0.0)     // remaining AFTER this payment
+  isPartial        Boolean       @default(false)   // true if paidAmount < totalDue
+  paymentStatus    PaymentStatus @default(SUCCESS)
+  paymentDate      DateTime      @default(now())
+  dueDate          DateTime
+  fineAmount       Float         @default(0.0)
+  receiptFile      String?
+  createdAt        DateTime      @default(now())
+}
+
+enum PaymentStatus {
+  SUCCESS
+  PARTIAL
+  PENDING
+  FAILED
+}
+
+model Notification {
+  id             String           @id @default(uuid())
+  studentId      String
+  student        Student          @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  message        String           @db.Text
+  type           NotificationType
+  sentStatus     SentStatus       @default(PENDING)
+  deliveryMethod DeliveryMethod
+  createdAt      DateTime         @default(now())
+}
+
+enum NotificationType {
+  REMINDER
+  URGENT
+  OVERDUE
+  MANUAL
+}
+
+enum SentStatus {
+  SUCCESS
+  FAILED
+  PENDING
+}
+
+enum DeliveryMethod {
+  EMAIL
+  WHATSAPP
+  BOTH
+}
+
+model ActivityLog {
+  id        String   @id @default(uuid())
+  adminId   String
+  action    String
+  details   String?  @db.Text
+  createdAt DateTime @default(now())
+}
