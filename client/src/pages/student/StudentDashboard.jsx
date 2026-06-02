@@ -6,7 +6,8 @@ import { Calendar, CreditCard, Bell, Download } from 'lucide-react';
 const getPhotoUrl = (path) => {
   if (!path) return null;
   if (path.startsWith('http://') || path.startsWith('https://')) return path;
-  return `http://localhost:5000${path}`;
+  const baseUrl = import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL.replace('/api', '') : 'http://localhost:5000';
+  return `${baseUrl}${path}`;
 };
 
 const StudentDashboard = () => {
