@@ -27,7 +27,18 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
-app.use(helmet());
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+      // Allow images from Cloudinary CDN, data URIs, and blobs
+      'img-src': ["'self'", 'data:', 'blob:', 'https://res.cloudinary.com'],
+      // Allow scripts and styles needed for React in production
+      'script-src': ["'self'"],
+      'style-src':  ["'self'", "'unsafe-inline'"],
+    },
+  },
+}));
 // In production the frontend is served from the same origin, so CORS is only needed for local dev
 app.use(cors({
   origin: isProduction ? false : ['http://localhost:5173', 'http://localhost:3000'],
