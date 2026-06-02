@@ -101,27 +101,37 @@ Built with a **React + Vite** frontend and a **Node.js + Express + Prisma** back
    npm run dev
    ```
 
-## ☁️ Deployment (Render)
+## ☁️ Deployment (Render — Single Service)
 
-This application can be easily deployed on [Render.com](https://render.com). 
+This project is configured to run as a **single Web Service** on Render. The Express backend builds and serves the React frontend automatically.
 
-### Option 1: Monorepo Deployment (Recommended)
-You can deploy both the frontend and backend as separate web services from this single GitHub repository.
+1. Push your code to GitHub.
+2. Go to [Render.com](https://render.com) → **New → Web Service**.
+3. Connect your GitHub repository.
+4. Set the following:
 
-**Backend Service:**
-1. Create a new **Web Service** on Render.
-2. Root Directory: `server`
-3. Build Command: `npm install && npx prisma generate`
-4. Start Command: `npm start` (Make sure `"start": "node index.js"` is in your `package.json`).
-5. Add all the Environment Variables from your `.env` file.
+   | Setting | Value |
+   |---|---|
+   | **Root Directory** | `server` |
+   | **Build Command** | `npm install && npm run build && npx prisma generate` |
+   | **Start Command** | `npm start` |
 
-**Frontend Service:**
-1. Create a new **Static Site** on Render.
-2. Root Directory: `client`
-3. Build Command: `npm install && npm run build`
-4. Publish Directory: `dist`
-5. Add Environment Variable: `VITE_API_URL` pointing to your deployed backend Render URL.
-6. **Important**: Add a Rewrite rule for React Router. Under "Redirects/Rewrites", set Source `/*`, Destination `/index.html`, Action `Rewrite`.
+5. Under **Environment Variables**, add all your keys (same as your `server/.env`), and add:
+
+   | Key | Value |
+   |---|---|
+   | `NODE_ENV` | `production` |
+   | `DATABASE_URL` | your DB URL |
+   | `JWT_SECRET` | your secret |
+   | `CLOUDINARY_CLOUD_NAME` | ... |
+   | `CLOUDINARY_API_KEY` | ... |
+   | `CLOUDINARY_API_SECRET` | ... |
+   | `EMAIL_USER` | ... |
+   | `EMAIL_PASS` | ... |
+
+6. Click **Deploy Web Service**. Once live, visit the Render URL — it will show your full React app!
+
+> **Note:** `VITE_API_URL` is NOT needed. Because the frontend and backend are on the same domain, all API calls automatically go to `/api`.
 
 ## 📜 License
 Private Software. All rights reserved.

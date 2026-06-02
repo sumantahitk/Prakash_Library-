@@ -1,5 +1,7 @@
 import express from 'express';
 import dns from 'dns';
+import { fileURLToPath } from 'url';
+import path from 'path';
 
 // Fix for Node 18+ hanging on IPv6 connections (Cloudinary timeout fix)
 dns.setDefaultResultOrder('ipv4first');
@@ -17,12 +19,20 @@ import { initCronJobs } from './cron/scheduler.js';
 
 dotenv.config({ override: true });
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname  = path.dirname(__filename);
+const isProduction = process.env.NODE_ENV === 'production';
+
 const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(helmet());
-app.use(cors());
+// In production the frontend is served from the same origin, so CORS is only needed for local dev
+app.use(cors({
+  origin: isProduction ? false : ['http://localhost:5173', 'http://localhost:3000'],
+  credentials: true,
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -39,10 +49,12 @@ const limiter = rateLimit({
 });
 app.use('/api', limiter);
 
-// Basic Route
-app.get('/', (req, res) => {
-  res.send('Prakash Library API is running...');
-});
+// Basic health-check route (only shown when not serving React)
+if (!isProduction) {
+  app.get('/', (req, res) => {
+    res.send('Prakash Library API is running (dev mode)...');
+  });
+}
 
 // API Routes
 app.use('/api/auth', authRoutes);
@@ -57,6 +69,16 @@ app.use((err, req, res, next) => {
   console.error("EXPRESS ERROR:", err);
   res.status(500).json({ message: err.message, stack: err.stack });
 });
+
+// ─── Serve React Frontend in Production ───────────────────────────────────────
+if (isProduction) {
+  const clientDist = path.join(__dirname, '..', 'client', 'dist');
+  app.use(express.static(clientDist));
+  // Catch-all: send React's index.html for any non-API route (React Router support)
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(clientDist, 'index.html'));
+  });
+}
 
 // Initialize Cron Jobs
 initCronJobs();

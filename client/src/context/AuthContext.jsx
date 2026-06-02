@@ -11,7 +11,9 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   // Configure axios defaults
-  axios.defaults.baseURL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+  // In production (Render), frontend & backend are the same origin, so use relative path.
+  // In local development, point to the local backend server.
+  axios.defaults.baseURL = import.meta.env.VITE_API_URL || '/api';
 
   useEffect(() => {
     const storedUser = localStorage.getItem('prakashUser');
