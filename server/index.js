@@ -75,7 +75,8 @@ if (isProduction) {
   const clientDist = path.join(__dirname, '..', 'client', 'dist');
   app.use(express.static(clientDist));
   // Catch-all: send React's index.html for any non-API route (React Router support)
-  app.get('*', (req, res) => {
+  // Note: app.use() instead of app.get('*') because Express 5 dropped bare wildcard support
+  app.use((req, res) => {
     res.sendFile(path.join(clientDist, 'index.html'));
   });
 }
