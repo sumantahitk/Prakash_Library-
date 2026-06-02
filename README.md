@@ -101,37 +101,4 @@ Built with a **React + Vite** frontend and a **Node.js + Express + Prisma** back
    npm run dev
    ```
 
-## ☁️ Deployment (Render — Single Service)
 
-This project is configured to run as a **single Web Service** on Render. The Express backend builds and serves the React frontend automatically.
-
-1. Push your code to GitHub.
-2. Go to [Render.com](https://render.com) → **New → Web Service**.
-3. Connect your GitHub repository.
-4. Set the following:
-
-   | Setting | Value |
-   |---|---|
-   | **Root Directory** | `server` |
-   | **Build Command** | `npm install && npm run build && npx prisma generate` |
-   | **Start Command** | `npm start` |
-
-5. Under **Environment Variables**, add all your keys (same as your `server/.env`), and add:
-
-   | Key | Value |
-   |---|---|
-   | `NODE_ENV` | `production` |
-   | `DATABASE_URL` | your DB URL |
-   | `JWT_SECRET` | your secret |
-   | `CLOUDINARY_CLOUD_NAME` | ... |
-   | `CLOUDINARY_API_KEY` | ... |
-   | `CLOUDINARY_API_SECRET` | ... |
-   | `EMAIL_USER` | ... |
-   | `EMAIL_PASS` | ... |
-
-6. Click **Deploy Web Service**. Once live, visit the Render URL — it will show your full React app!
-
-> **Note:** `VITE_API_URL` is NOT needed. Because the frontend and backend are on the same domain, all API calls automatically go to `/api`.
-
-## 📜 License
-Private Software. All rights reserved.
