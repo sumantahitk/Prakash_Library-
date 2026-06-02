@@ -50,12 +50,31 @@ export const addPayment = async (req, res) => {
     // Update student status and balance
     let newFeeStatus  = isPartial ? 'PENDING' : 'PAID';
     let nextDueDateUp = {};
+
     if (!isPartial) {
-      // Full payment done — advance next due date by 1 month immediately
-      const base = student.nextDueDate ? new Date(student.nextDueDate) : new Date();
-      base.setMonth(base.getMonth() + 1);
-      base.setUTCHours(0, 0, 0, 0);
-      nextDueDateUp = { nextDueDate: base };
+      let shouldAdvance = false;
+      const today = new Date();
+      today.setUTCHours(0, 0, 0, 0);
+      
+      const currentNextDue = student.nextDueDate ? new Date(student.nextDueDate) : new Date();
+      currentNextDue.setUTCHours(0, 0, 0, 0);
+
+      if (student.feeStatus === 'PAID') {
+        // Paying early for the next cycle
+        shouldAdvance = true;
+      } else if (currentNextDue <= today) {
+        // Paying a due balance where the due date has already passed or is today
+        shouldAdvance = true;
+      } else {
+        // PENDING/DUE but nextDueDate is ALREADY in the future (e.g., just registered)
+        shouldAdvance = false;
+      }
+
+      if (shouldAdvance) {
+        const base = new Date(currentNextDue);
+        base.setMonth(base.getMonth() + 1);
+        nextDueDateUp = { nextDueDate: base };
+      }
     }
 
     await prisma.student.update({
