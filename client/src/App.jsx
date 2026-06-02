@@ -2,6 +2,7 @@ import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
 import { Toaster } from 'react-hot-toast';
+import LoadingScreen from './components/LoadingScreen';
 
 // Placeholder Components until actual ones are built
 import DashboardLayout from './layouts/DashboardLayout';
@@ -32,7 +33,7 @@ const App = () => {
   return (
     <>
       <Toaster position="top-right" />
-      <React.Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-background">Loading...</div>}>
+      <React.Suspense fallback={<LoadingScreen />}>
         <Routes>
           <Route path="/" element={<Navigate to="/login" />} />
           <Route path="/login" element={<Login />} />

@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
+import LoadingScreen from '../components/LoadingScreen';
 
 const AuthContext = createContext();
 
@@ -59,7 +60,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   if (loading) {
-    return <div className="min-h-screen flex items-center justify-center bg-gray-900 text-white">Loading...</div>;
+    return <LoadingScreen />;
   }
 
   return (
